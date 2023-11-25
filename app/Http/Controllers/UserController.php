@@ -21,6 +21,7 @@ class UserController extends Controller
                     ->column('email')
                     ->column('created_at')
                     ->column('actions')
+                    ->searchInput('name')
                     ->paginate(15)
         ]); 
     }
@@ -60,24 +61,40 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        return view('users.edit' , [
+            'user'=>$user
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+         ]);
+
+         Toast::title('User Data Saved')->autoDismiss(3);
+
+         return to_route('users.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+ 
+        Toast::title('User Data Delete')
+            ->danger()
+            ->autoDismiss(3);
+
+        return to_route('users.index');
     }
 }
